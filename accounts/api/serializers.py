@@ -1,24 +1,23 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from accounts.models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    age = serializers.IntegerField()
+    country = serializers.CharField(max_length=50)
+    gender = serializers.CharField(max_length=10)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        fields = ['id', 'email', 'password', 'age', 'country', 'gender', 'username']
 
     def save(self):
         if User.objects.filter(email=self.validated_data['email']).exists():
             raise serializers.ValidationError({'error': 'Email already exists!'})
 
-        account = User(email=self.validated_data['email'], username=self.validated_data['username'])
+        account = User(email=self.validated_data['email'],age=self.validated_data['age'],country=self.validated_data['country'],gender=self.validated_data['gender'], username=self.validated_data['username'],)
         account.set_password(self.validated_data['password'])
         account.save()
-
         return account
 
 
@@ -27,4 +26,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'posts']
+        exclude = ['password', 'first_name', 'last_name', 'groups', 'user_permissions']
