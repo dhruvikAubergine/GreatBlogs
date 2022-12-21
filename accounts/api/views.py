@@ -1,7 +1,9 @@
 from rest_framework import status, generics
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from accounts.api.serializers import RegisterSerializer, UserSerializer, EmailVerificationSerializer, LoginSerializer
+from accounts.api.serializers import RegisterSerializer, UserSerializer, EmailVerificationSerializer, LoginSerializer, \
+    ChangePasswordSerializer, UpdateProfileSerializer
 from accounts.models import User
 from django.contrib.auth import authenticate, login
 from .utils import get_tokens_for_user
@@ -12,6 +14,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .utils import Util
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+
+
 # Create your views here.
 
 
@@ -53,7 +57,7 @@ class VerifyEmailView(APIView):
     def get(self, request):
         token = request.GET.get('token')
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY,  algorithms='HS256')
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
             user = User.objects.get(id=payload['user_id'])
             print(str(user.is_verified))
             if not user.is_verified:
@@ -74,3 +78,16 @@ class UserListView(generics.ListAPIView):
 class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class ChangePasswordView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = ChangePasswordSerializer
+
+
+class UpdateProfileView(generics.UpdateAPIView):
+
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = UpdateProfileSerializer

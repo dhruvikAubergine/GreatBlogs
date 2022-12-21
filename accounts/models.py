@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .manager import UserManager
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from django.core.mail import send_mail
 # Create your models here.
 
 
@@ -31,3 +35,14 @@ class User(AbstractUser):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+
+
+@receiver(post_save, sender=User)
+def send_update_profile_email(sender, instance, **kwargs):
+    user = sender.objects.get(id=instance.id)
+    subject = 'GreatBlog Account Information'
+    message = f'Hi {user.username},\nYour profile details is updated.'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [user.email, ]
+    send_mail(subject, message, email_from, recipient_list)
+

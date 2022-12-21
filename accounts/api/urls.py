@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import RegisterView, UserDetailView, UserListView, LoginView, VerifyEmailView
-
+from .views import RegisterView, UserDetailView, UserListView, LoginView, VerifyEmailView, ChangePasswordView, \
+    UpdateProfileView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='ragister'),
@@ -10,4 +10,6 @@ urlpatterns = [
     path('users/', UserListView.as_view()),
     path('users/<int:pk>/', UserDetailView.as_view()),
 
+    path('change_password/<int:pk>/', ChangePasswordView.as_view(), name='auth_change_password'),
+    path('update_profile/<int:pk>/', UpdateProfileView.as_view(), name='auth_update_profile'),
 ]
