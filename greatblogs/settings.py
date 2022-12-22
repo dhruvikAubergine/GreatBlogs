@@ -84,10 +84,15 @@ AUTH_USER_MODEL = 'accounts.User'
 DATABASES = {
     "default": {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'greatblogs',
-        'USER': 'dhruvik',
-        'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
+        'NAME':'railway',
+        'USER':'postgres',
+        'PASSWORD':'gtOdwTTsUVDRRYlrktYO',
+        'HOST':'containers-us-west-187.railway.app',
+        'PORT': '5445',
+        # 'NAME': 'greatblogs',
+        # 'USER': 'dhruvik',
+        # 'PASSWORD': 'admin',
+        # 'HOST': '127.0.0.1',
     }
 }
 
