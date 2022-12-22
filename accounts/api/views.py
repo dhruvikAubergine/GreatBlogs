@@ -28,6 +28,7 @@ class RegisterView(APIView):
         if serializer.is_valid():
             serializer.save()
 
+            print(str(serializer.data))
             user_data = serializer.data
             user = User.objects.get(email=user_data["email"])
             token = RefreshToken.for_user(user).access_token
@@ -49,6 +50,8 @@ class RegisterView(APIView):
 
             return Response(user_data)
         else:
+            print(str(serializer.errors))
+            print("------------------------------")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
