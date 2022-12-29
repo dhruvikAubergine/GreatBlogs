@@ -6,20 +6,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from django.core.mail import send_mail
-# Create your models here.
 
 
+#
 class User(AbstractUser):
-    username = models.CharField(max_length = 50, blank = True, null = True, unique = True)
+    username = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    gender = models.CharField(max_length=10)
     age = models.IntegerField()
     country = models .CharField(max_length=50)
-    gender = models.CharField(max_length=10)
     is_verified = models.BooleanField(default=False)
-    email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
-        unique=True,
-    )
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
