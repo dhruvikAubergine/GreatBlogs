@@ -1,8 +1,8 @@
 from rest_framework import permissions
 
 
-# For give the permission to author of accessing their blogs
 class IsAuthorOrReadOnly(permissions.BasePermission):
+    # For give the permission to author of accessing their blogs
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True

@@ -10,10 +10,12 @@ from django.core.mail import EmailMessage
 #         "access": str(refresh.access_token),
 #     }
 
-# Sending email for account activation
 class Util:
     @staticmethod
     def send_email(data):
+        """
+        send_email method used to send the email to user for account activation.
+        """
         email = EmailMessage(
             subject=data["email_subject"],
             body=data["email_body"],

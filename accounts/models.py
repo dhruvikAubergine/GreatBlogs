@@ -10,6 +10,10 @@ from django.core.mail import send_mail
 
 #
 class User(AbstractUser):
+    """
+    Created a custom user model using AbstractUser
+    Made email field to username field
+    """
     username = models.CharField(max_length=50, blank=True, null=True, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     gender = models.CharField(max_length=10)
@@ -26,6 +30,9 @@ class User(AbstractUser):
         return self.email
 
     def tokens(self):
+        """
+        To get refresh and access token from jwt.
+        """
         refresh = RefreshToken.for_user(self)
         return {
             'refresh': str(refresh),
@@ -35,6 +42,9 @@ class User(AbstractUser):
 
 @receiver(post_save, sender=User)
 def send_update_profile_email(sender, instance, **kwargs):
+    """
+    Send email for user profile updates.
+    """
     user = sender.objects.get(id=instance.id)
     subject = 'GreatBlog Account Information'
     message = f'Hi {user.username},\nYour profile details is updated.'

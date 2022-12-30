@@ -18,19 +18,28 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 
 
-# For user registration in a system
 class RegisterView(APIView):
+    """
+    RegisterView is used to register user to the system.
+    """
     def post(self, request):
+        """
+        RegisterView's post method is for create new user
+        """
         serializer = RegisterSerializer(data=request.data)
+        # Validation of fields using serializer
         if serializer.is_valid():
             serializer.save()
 
             user_data = serializer.data
             user = User.objects.get(email=user_data["email"])
+            # Get access token from jwt
             token = RefreshToken.for_user(user).access_token
+            # Fetch current site domain
             current_site = get_current_site(request).domain
             relativeLink = reverse("email-verify")
             absurl = "http://" + current_site + relativeLink + "?token=" + str(token)
+            # Email body for send email activation link
             email_body = (
                 "Hi "
                 + user.username
@@ -42,6 +51,7 @@ class RegisterView(APIView):
                 "to_email": user.email,
                 "email_subject": "Verify your email",
             }
+            # Send email with data
             Util.send_email(data)
 
             return Response(
@@ -54,11 +64,16 @@ class RegisterView(APIView):
             )
 
 
-# For user login in a system
 class LoginView(APIView):
+    """
+    LoginView used to authenticate user with jwt token.
+    """
     serializer_class = LoginSerializer
 
     def post(self, request):
+        """
+        LoginView's post method for authenticate the user details.
+        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(
@@ -67,17 +82,23 @@ class LoginView(APIView):
         )
 
 
-# For verifing email for account activation
 class VerifyEmailView(APIView):
+    """
+    VerifyEmailView used to verify email for account activation.
+    """
     serializer_class = EmailVerificationSerializer
 
     def get(self, request):
+        """
+        VerifyEmailView's get method used to verify email.
+        """
         token = request.GET.get("token")
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
             user = User.objects.get(id=payload["user_id"])
 
             if not user.is_verified:
+                # Make is_verified field true if user click on the activation link.
                 user.is_verified = True
                 user.save()
             return Response(
@@ -93,8 +114,10 @@ class VerifyEmailView(APIView):
             )
 
 
-# For reset the password of user's account
 class ChangePasswordView(APIView):
+    """
+    ChangePassword used for change the password of user's account.
+    """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, *args, **kwargs):
@@ -113,8 +136,10 @@ class ChangePasswordView(APIView):
         )
 
 
-# For update the profile of user
 class UpdateProfileView(APIView):
+    """
+    UpdateProfileView used for update the profile.
+    """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def put(self, request, pk):
