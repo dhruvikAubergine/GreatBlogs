@@ -5,6 +5,9 @@ class UserManager(BaseUserManager):
     use_in_migration = True
 
     def create_user(self, email, password=None, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
         if not email:
             raise ValueError('Users must have an email address')
 
@@ -15,6 +18,9 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)

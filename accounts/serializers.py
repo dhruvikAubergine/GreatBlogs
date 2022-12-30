@@ -7,6 +7,9 @@ from django.core.validators import EmailValidator
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    """
+    RegisterSerializer used to validate fields.
+    """
     age = serializers.IntegerField()
     country = serializers.CharField(max_length=50)
     gender = serializers.CharField(max_length=10)
@@ -16,6 +19,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ["id", "email", "password", "age", "country", "gender", "username"]
 
     def save(self):
+        """
+        Save method is used to save the user details into the database.
+        """
         if User.objects.filter(email=self.validated_data["email"]).exists():
             raise serializers.ValidationError({"error": "Email already exists!"})
 
@@ -32,6 +38,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
+    """
+    EmailVerificationSerializer is used to validate the user's email.
+    """
     token = serializers.CharField(max_length=555)
 
     class Meta:
@@ -40,6 +49,9 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.ModelSerializer):
+    """
+    LoginSerializer is used to validate fields.
+    """
     email = serializers.EmailField(max_length=255, min_length=3)
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     tokens = serializers.CharField(max_length=555, min_length=6, read_only=True)
@@ -52,6 +64,7 @@ class LoginSerializer(serializers.ModelSerializer):
         email = attrs.get("email", "")
         password = attrs.get("password", "")
 
+        # Validate user with email id and password
         user = auth.authenticate(email=email, password=password)
 
         if not user:
@@ -65,6 +78,9 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
+    """
+    ChangePasswordSerializer used to validate old and new password.
+    """
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
     )
@@ -76,6 +92,9 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
+    """
+    UpdateProfileSerializer used to validate updated fields.
+    """
     email = serializers.EmailField(required=True)
 
     class Meta:
@@ -84,6 +103,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         extra_kwargs = {"email": {"validators": [EmailValidator]}}
 
     def update(self, instance, validated_data):
+        # Update profile details with validated data
         instance.email = validated_data["email"]
         instance.username = validated_data["username"]
         instance.age = validated_data["age"]

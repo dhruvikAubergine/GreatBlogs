@@ -9,8 +9,10 @@ from .permissions import IsAuthorOrReadOnly
 from rest_framework.views import APIView
 
 
-# For get a blog list with pagination and create a new blog
-class BlogList(APIView):
+class BlogListView(APIView):
+    """
+    BlogListView used to create and get list of blog list.
+    """
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
@@ -20,6 +22,9 @@ class BlogList(APIView):
 
     @property
     def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
         if not hasattr(self, "_paginator"):
             if self.pagination_class is None:
                 self._paginator = None
@@ -28,15 +33,24 @@ class BlogList(APIView):
         return self._paginator
 
     def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
         if self.paginator is None:
             return None
         return self.paginator.paginate_queryset(queryset, self.request, view=self)
 
     def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
 
     def get(self, request):
+        """
+        BlogListView's get method used to get list of blogs with pagination.
+        """
         queryset = self.queryset.order_by("-created_on")
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -47,6 +61,9 @@ class BlogList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        """
+        BlogListView's post method used to create new blog.
+        """
         serializer = BlogSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=self.request.user)
@@ -60,12 +77,17 @@ class BlogList(APIView):
         )
 
 
-# For get particular blog details, update and delete
-class BlogDetail(APIView):
+class BlogDetailView(APIView):
+    """
+    BlogDetailsView used to get details, update and delete the blog.
+    """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
     serializer_class = BlogSerializer
 
     def get(self, request, pk):
+        """
+         BlogDetailsView's get method used to get particular blog details.
+        """
         try:
             blog = Blog.objects.get(pk=pk)
         except Blog.DoesNotExist:
@@ -75,6 +97,9 @@ class BlogDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
+        """
+        BlogDetailsView's put method used to update particular blog details.
+        """
         blog = Blog.objects.get(pk=pk)
         serializer = BlogSerializer(blog, data=request.data)
         if serializer.is_valid():
@@ -86,6 +111,9 @@ class BlogDetail(APIView):
         )
 
     def delete(self, request, pk):
+        """
+        BlogDetailsView's used to delete particular blog.
+        """
         blog = Blog.objects.get(pk=pk)
         blog.delete()
         return Response(
